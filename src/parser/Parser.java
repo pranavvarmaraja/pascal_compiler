@@ -1,13 +1,24 @@
 package parser;
 
 import scanner.*;
-
-import java.util.HashMap;
+import ast.Number;
+import ast.Statement;
+import ast.Expression;
+import ast.If;
+import ast.Variable;
+import ast.BinOp;
+import ast.Writeln;
+import ast.Assignment;
+import ast.Block;
+import java.util.List;
+import java.util.ArrayList;
+import ast.Condition;
+import ast.While;
 
 /**
  * Parser is a PASCAL parser for Compilers and Interpreters (2021-2022) lab exercise 2
  * The parser takes in a scanner pointing to a string or text file, and is able to parse PASCAL statements 
- * and expressions
+ * and expressions, returning Statement, Expression, and Condition objects as part of an AST.
  * @author Pranav Varmaraja
  * @version 01/10/2022
  * Usage:
@@ -18,7 +29,6 @@ public class Parser {
 
     private Scanner scanner;
     private String currToken;
-    private HashMap<String, Integer> map;
 
     /**
      * Parser constructor for construction of a parser that
@@ -32,7 +42,6 @@ public class Parser {
     public Parser(Scanner s)
     {
         scanner = s;
-        map = new HashMap<String, Integer>();
         try
         {
             currToken = scanner.nextToken();
@@ -77,10 +86,10 @@ public class Parser {
      * should not be called if currToken is not an integer
      * @return the integer value of currToken
      */
-    private int parseNumber() {
+    private Number parseNumber() {
         int num = Integer.parseInt(currToken);
         eat(""+num);
-        return num;
+        return new Number(num);
     }
 
     /**
@@ -89,36 +98,52 @@ public class Parser {
      * if a variable is declared, adds said variable to the HashMap<String, Integer> map
      * prints the results of all WRITELN statements to the console
      */
-    public void parseStatement() {
+    public Statement parseStatement() {
         if(currToken.equals("WRITELN")) {
             eat("WRITELN");
             eat("(");
-            int num = parseExpression();
+            Expression exp = parseExpression();
             eat(")");
             eat(";");
-            System.out.println(num);
+            return new Writeln(exp);
         } else if(currToken.equals("BEGIN")) {
+            List<Statement> stmts = new ArrayList<Statement>();
             eat("BEGIN");
             while(currToken.equals("BEGIN") || currToken.equals("WRITELN") || currToken.equals("END") || 
             Scanner.isLetter(currToken.charAt(0))) {
                 if(currToken.equals("END")) {
                     eat("END");
                     eat(";");
-                    break;
+                    return new Block(stmts);
                 } else  {
-                    parseStatement();
+                    stmts.add(parseStatement());
                 }
             }
+        } else if(currToken.equals("IF")) {
+            eat("IF");
+            Condition condition = parseCondition();
+            eat("THEN");
+            Statement stmt = parseStatement();
+            return new If(condition, stmt);            
+
+        } else if(currToken.equals("WHILE")) {
+            eat("WHILE");
+            Condition condition = parseCondition();
+            eat("DO");
+            Statement stmt = parseStatement();
+            return new While(condition, stmt); 
+
         } else if(Scanner.isLetter(currToken.charAt(0))) {
             String varName = currToken;
             eat(currToken);
             eat(":=");
-            int varValue = parseExpression();
+            Expression varValue = parseExpression();
             eat(";");
-            map.put(varName, varValue);
+            return new Assignment(varName, varValue);
             
 
         }
+        return null;
         
     }
 
@@ -127,23 +152,22 @@ public class Parser {
      * parses a factor, as per the grammar definition in the lab document, id | num | (expr) | - factor
      * @return int value of the factor, with all parentheses and negative signs applied
      */
-    public int parseFactor() {
+    public Expression parseFactor() {
         try {
-            if(map.keySet().contains(currToken)) {
-                String varName = currToken;
-                eat(currToken);
-                return map.get(varName);
-            }
             return this.parseNumber();
         } catch(NumberFormatException e) {
             if(currToken.equals("(")) {
                 eat(currToken);
-                int num = parseExpression();
+                Expression num = parseExpression();
                 eat(")");
                 return num;
-            } else {
+            } else if(currToken.equals("-")) {
                 eat("-");
-                return -1*parseFactor();
+                return new BinOp("-", new Number(0),parseFactor());
+            } else {
+                String varName = currToken;
+                eat(currToken);
+                return new Variable(varName);
             }
         }
     }
@@ -153,15 +177,15 @@ public class Parser {
      * recursively parses a multiplication or division term, i.e. a term*factor, or a term/factor.
      * @return int value of the term, with all multiplication, division, parentheses, negative signs applied
      */
-    public int parseTerm() {
-        int val = this.parseFactor();
+    public Expression parseTerm() {
+        Expression val = parseFactor();
         while(currToken.equals("*") || currToken.equals("/")) {
             String operator = currToken;
             eat(currToken);
             if(operator.equals("*")) {
-                val = val*parseFactor();
+                val = new BinOp("*",val,parseFactor());
             } else if(operator.equals("/")) {
-                val= val/parseFactor();
+                val = new BinOp("/",val,parseFactor());
             }
 
         }
@@ -173,18 +197,26 @@ public class Parser {
      * parses a factor, as per the grammar definition in the lab document, id | num | (expr) | - factor
      * @return int value of the expression, with all mathematical operations, grouping, and negative signs applied
      */
-    public int parseExpression() {
-        int val = this.parseTerm();
+    public Expression parseExpression() {
+        Expression val = this.parseTerm();
         while(currToken.equals("+") || currToken.equals("-")) {
             String operator = currToken;
             eat(currToken);
             if(operator.equals("+")) {
-                val = val+parseTerm();
+                val = new BinOp("+",val,parseTerm());
             } else if(operator.equals("-")){
-                val = val-parseTerm();
+                val = new BinOp("-",val,parseTerm());
             }
         }
         return val;
+    }
+
+    public Condition parseCondition() {
+        Expression exp1 = parseExpression();
+        String op = currToken;
+        eat(currToken);
+        Expression exp2 = parseExpression();
+        return new Condition(exp1, op, exp2);
     }
 
    
