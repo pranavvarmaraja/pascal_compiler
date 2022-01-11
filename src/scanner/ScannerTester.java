@@ -16,7 +16,7 @@ public class ScannerTester {
         try{
 //            paste filepath to the text file you wish to tokenize below
             scanner = new Scanner(new FileInputStream
-                    (new File("/home/pranav/projects/ATCS_Compilers/Compiler/src/scanner/ScannerTest.txt")));
+                    (new File("/home/pranav/projects/ATCS_Compilers/Compiler/src/scanner/scanner_testing/ScannerTest.txt")));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
