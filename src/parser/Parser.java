@@ -84,7 +84,7 @@ public class Parser {
      * Method: parseNumer
      * parses the current token and returns the numeric value of said token,
      * should not be called if currToken is not an integer
-     * @return the integer value of currToken
+     * @return the Number containing the integer value of currToken
      */
     private Number parseNumber() {
         int num = Integer.parseInt(currToken);
@@ -94,9 +94,9 @@ public class Parser {
 
     /**
      * Method: parseStatement
-     * parses a BEGIN..END, WRITELN, or variable declaration (e.g. x:=10) statement in PASCAL
-     * if a variable is declared, adds said variable to the HashMap<String, Integer> map
-     * prints the results of all WRITELN statements to the console
+     * parses a BEGIN..END, WRITELN, IF..THEN, WHILE..DO, or variable declaration (e.g. x:=10) PASCAL statement
+     * returns the AST statement class corresponding to the statement parsed.
+     * @return Statement AST statement parsed
      */
     public Statement parseStatement() {
         if(currToken.equals("WRITELN")) {
@@ -150,7 +150,7 @@ public class Parser {
     /**
      * Method: parseFactor
      * parses a factor, as per the grammar definition in the lab document, id | num | (expr) | - factor
-     * @return int value of the factor, with all parentheses and negative signs applied
+     * @return Expression AST class corresponding to the given factor.
      */
     public Expression parseFactor() {
         try {
@@ -175,7 +175,7 @@ public class Parser {
     /**
      * Method: parseTerm
      * recursively parses a multiplication or division term, i.e. a term*factor, or a term/factor.
-     * @return int value of the term, with all multiplication, division, parentheses, negative signs applied
+     * @return Expression corresponding to the correct AST Class (Binop, Variable, Number)
      */
     public Expression parseTerm() {
         Expression val = parseFactor();
@@ -192,10 +192,10 @@ public class Parser {
         return val;
     }
 
-/**
+    /**
      * Method: parseExpression
-     * parses a factor, as per the grammar definition in the lab document, id | num | (expr) | - factor
-     * @return int value of the expression, with all mathematical operations, grouping, and negative signs applied
+     * parses an expression , as per the grammar definition in the lab document
+     * @return Expression AST class of the next expression in the token stream (BinOp, Number, Variable)
      */
     public Expression parseExpression() {
         Expression val = this.parseTerm();
@@ -211,6 +211,11 @@ public class Parser {
         return val;
     }
 
+    /**
+     * Method: parseCondition
+     * parses a condition, as per grammar: condition -> expr relop expr
+     * @return Condition AST class of the next Condition in the token stream (e.g. 10>5)
+     */    
     public Condition parseCondition() {
         Expression exp1 = parseExpression();
         String op = currToken;
