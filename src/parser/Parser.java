@@ -54,6 +54,11 @@ public class Parser {
         }
     }
 
+    /**
+     * checks to see whether input String qualifies as a word (all letters)
+     * @param s String to be checked
+     * @return true if contains all letters, false otherwise
+     */
     private boolean isWord(String s) {
 
         for(int i=0; i < s.length(); i++) {
@@ -163,7 +168,7 @@ public class Parser {
 
     /**
      * Method: parseFactor
-     * parses a factor, as per the grammar definition in the lab document, id | num | (expr) | - factor
+     * parses a factor, as per the grammar definition in the lab document, id | num | (expr) | - factor | id()
      * @return Expression AST class corresponding to the given factor.
      */
     public Expression parseFactor() {
@@ -252,6 +257,10 @@ public class Parser {
         return new Condition(exp1, op, exp2);
     }
 
+    /**
+     * parses a program, defined as procedureDeclarations followed by a statement
+     * @return Program, AST class containing the procedureDeclaration list and the body of the program
+     */
     public Program parseProgram() {
 
         ArrayList<ProcedureDeclaration> procedures = new ArrayList<ProcedureDeclaration>();
@@ -263,6 +272,10 @@ public class Parser {
 
     }
 
+    /**
+     * parses a procedureDeclaration in the form PROCEDURE id(params); stmt
+     * @return ProcedureDeclaration AST class storing the name, body, and params of the declaration
+     */
     public ProcedureDeclaration parseProcedure() {
         eat("PROCEDURE");
         String procedureName = currToken;

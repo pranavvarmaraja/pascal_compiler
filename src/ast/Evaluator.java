@@ -1,7 +1,6 @@
 package ast;
 import environment.Environment;
 import java.util.List;
-import java.util.ArrayList;
 
 /**
  * Evaluator is a class which evaluates the various AST classes returned by the parser
@@ -16,6 +15,11 @@ public class Evaluator {
     public Evaluator() {
     }
 
+    /**
+     * executes and runs a full PASCAL program, in the form declarations stmt, repeatedly calls execProcedureDeclaration followed by exec
+     * @param p Program to be executed
+     * @param env global environment for program to be executed in
+     */
     public void run(Program p, Environment env) {
         for(ProcedureDeclaration dec: p.getProcedures()) {
             execProcedureDeclaration(dec, env);
@@ -24,6 +28,11 @@ public class Evaluator {
 
     }
 
+    /**
+     * executes a new procedure declaration, storing the procedure name along with the declaration itself in the environment
+     * @param dec declaration to be stored
+     * @param env environment for declaration to be stored in
+     */
     public void execProcedureDeclaration(ProcedureDeclaration dec, Environment env) {
         env.setProcedure(dec.getName(), dec);
     }
@@ -94,6 +103,13 @@ public class Evaluator {
         }
     }
 
+    /**
+     * evaluates a procedure call with parameters, spinning up a new environment for these variables 
+     * to be added into and executing any statements within the body of the procedure
+     * @param exp ProcedureCall to be executed
+     * @param env global environment to be executed in
+     * @return the return value of the procedure, defined as the variable with the same name as the procedure
+     */
     public int evalProcedureCall(ProcedureCall exp, Environment env) {
         ProcedureDeclaration dec = env.getProcedure(exp.getName());
         List<Expression> params = exp.getParams();

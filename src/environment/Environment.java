@@ -21,6 +21,10 @@ public class Environment {
     HashMap<String, ProcedureDeclaration> procedures;
     Environment parent;
 
+    /**
+     * Constructor for an environment object, initializes empty maps for variables and procedures symbol tables
+     * initializes parent to null
+     */
     public Environment() {
 
         variables = new HashMap<String, Integer>();
@@ -29,6 +33,11 @@ public class Environment {
 
     }
 
+    /**
+     * Constructor for an environment object, initializes empty maps for variables and procedures symbol tables
+     * initializes parent to to env
+     * @param env parent Environment
+     */
     public Environment(Environment env) {
 
         variables = new HashMap<String, Integer>();
@@ -50,6 +59,7 @@ public class Environment {
 
     /**
      * returns the value of variable variable as given by the HashMap variables
+     * checks the current env, and its parent for the variable
      * @param variable variable whose value is to be queried
      * @return int value of the variable
      */
@@ -62,6 +72,11 @@ public class Environment {
         }
     }
 
+    /**
+     * sets the procedureName in the global symbol table
+     * @param name String name of the procedure
+     * @param declaration ProcedureDeclaration object of the declaration
+     */
     public void setProcedure(String name, ProcedureDeclaration declaration) {
         Environment rootEnv = this;
         if(rootEnv.getParent()==null) {
@@ -74,6 +89,11 @@ public class Environment {
         
     }
 
+    /**
+     * returns the ProcedureDeclaration corresponding to a given procedureName in the global symbol table
+     * @param name String name of procedure to be checked
+     * @return ProcedureDeclaration object of the declaration
+     */
     public ProcedureDeclaration getProcedure(String name) {
         Environment rootEnv = this;
         if(rootEnv.getParent()==null) {
@@ -83,6 +103,10 @@ public class Environment {
         return rootEnv.getProcedure(name);
     }
 
+    /**
+     * getter which returns the parent of this environment
+     * @return Environment parent of this environment
+     */
     public Environment getParent() {
         return parent;
 

@@ -5,7 +5,7 @@ import parser.Parser;
 import environment.Environment;
 
 /**
- * EvaluatorTester is a tester for the Evaluator class. Paste the desired filepath to the PASCAL program below, and this will evaluate each statement within it
+ * EvaluatorTester is a tester for the Evaluator class. Paste the desired filepath to the PASCAL program below, and this will evaluate the entirety of the program
  * @author Pranav Varmaraja
  * @version 01/11/2022
  */
