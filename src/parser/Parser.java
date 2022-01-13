@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.ArrayList;
 import ast.Condition;
 import ast.While;
+import ast.Program;
+import ast.ProcedureDeclaration;
+import ast.ProcedureCall;
 
 /**
  * Parser is a PASCAL parser for Compilers and Interpreters (2021-2022) lab exercise 2
@@ -50,6 +53,18 @@ public class Parser {
             e.printStackTrace();
         }
     }
+
+    private boolean isWord(String s) {
+
+        for(int i=0; i < s.length(); i++) {
+            if(!Scanner.isLetter(s.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+
+    }
+
 
     /**
      * Method: eat
@@ -109,8 +124,7 @@ public class Parser {
         } else if(currToken.equals("BEGIN")) {
             List<Statement> stmts = new ArrayList<Statement>();
             eat("BEGIN");
-            while(currToken.equals("BEGIN") || currToken.equals("WRITELN") || currToken.equals("END") || 
-            Scanner.isLetter(currToken.charAt(0))) {
+            while(currToken.equals("BEGIN") || currToken.equals("WRITELN") || currToken.equals("END") || isWord(currToken)) {
                 if(currToken.equals("END")) {
                     eat("END");
                     eat(";");
@@ -133,7 +147,7 @@ public class Parser {
             Statement stmt = parseStatement();
             return new While(condition, stmt); 
 
-        } else if(Scanner.isLetter(currToken.charAt(0))) {
+        } else if(isWord(currToken)) {
             String varName = currToken;
             eat(currToken);
             eat(":=");
@@ -166,8 +180,22 @@ public class Parser {
                 return new BinOp("-", new Number(0),parseFactor());
             } else {
                 String varName = currToken;
+                ArrayList<Expression> params = new ArrayList<Expression>();
                 eat(currToken);
-                return new Variable(varName);
+                if(currToken.equals("(")) {
+                    eat("(");
+                    while(!currToken.equals(")")) {
+                        params.add(parseExpression());
+                        if(currToken.equals(",")) {
+                            eat(",");
+                        }
+                    }
+                    eat(")");
+                    return new ProcedureCall(varName,params);
+
+                } else {
+                    return new Variable(varName);      
+                }
             }
         }
     }
@@ -223,6 +251,38 @@ public class Parser {
         Expression exp2 = parseExpression();
         return new Condition(exp1, op, exp2);
     }
+
+    public Program parseProgram() {
+
+        ArrayList<ProcedureDeclaration> procedures = new ArrayList<ProcedureDeclaration>();
+
+        while(currToken.equals("PROCEDURE")) {
+            procedures.add(parseProcedure());
+        }
+        return new Program(procedures, parseStatement());
+
+    }
+
+    public ProcedureDeclaration parseProcedure() {
+        eat("PROCEDURE");
+        String procedureName = currToken;
+        ArrayList<String> params = new ArrayList<String>();
+        eat(currToken);
+        eat("(");
+        while(!currToken.equals(")")) {
+            params.add(currToken);
+            eat(currToken);
+            if(currToken.equals(",")) {
+                eat(",");
+            }
+
+        }
+        eat(")");
+        eat(";");
+        return new ProcedureDeclaration(procedureName, parseStatement(),params);
+    }
+
+
 
    
 

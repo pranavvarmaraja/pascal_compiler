@@ -208,7 +208,7 @@ public class Scanner
     private String scanOperand() throws ScanErrorException
     {
         String ret = "";
-        char[] operands = {'=', '+', '-', '*', '/', '%', '(', ')',';'};
+        char[] operands = {'=', '+', '-', '*', '/', '%', '(', ')',';',','};
         if(currentChar=='<' || currentChar==':' || currentChar=='>')
         {
             ret+=currentChar;

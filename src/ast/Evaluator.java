@@ -1,5 +1,7 @@
 package ast;
 import environment.Environment;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Evaluator is a class which evaluates the various AST classes returned by the parser
@@ -12,6 +14,18 @@ public class Evaluator {
      * constructor, creates an instance of the evaluator
      */
     public Evaluator() {
+    }
+
+    public void run(Program p, Environment env) {
+        for(ProcedureDeclaration dec: p.getProcedures()) {
+            execProcedureDeclaration(dec, env);
+        }
+        exec(p.getStatement(), env);
+
+    }
+
+    public void execProcedureDeclaration(ProcedureDeclaration dec, Environment env) {
+        env.setProcedure(dec.getName(), dec);
     }
 
     /**
@@ -73,9 +87,23 @@ public class Evaluator {
             return evalNumber((Number) exp, env);
         } else if(exp instanceof Variable) {
             return evalVariable((Variable) exp,env);
-        } else {
+        } else if(exp instanceof BinOp) {
             return evalBinOp((BinOp) exp,env);
+        } else {
+            return evalProcedureCall((ProcedureCall) exp, env);
         }
+    }
+
+    public int evalProcedureCall(ProcedureCall exp, Environment env) {
+        ProcedureDeclaration dec = env.getProcedure(exp.getName());
+        List<Expression> params = exp.getParams();
+        Environment newEnv = new Environment(env);
+        for(int i = 0; i<params.size(); i++) {
+            newEnv.setVariable(dec.getParameters().get(i), eval(params.get(i),env));
+            newEnv.setVariable(exp.getName(),0);
+        }
+        exec(dec.getBody(),newEnv);
+        return newEnv.getVariable(exp.getName());
     }
 
     /**
