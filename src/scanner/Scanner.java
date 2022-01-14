@@ -213,6 +213,11 @@ public class Scanner
         {
             ret+=currentChar;
             eat(currentChar);
+            if(ret.equals("<")) {
+                if(currentChar=='>') {
+                    ret+=currentChar;
+                }
+            }
             if(currentChar=='=')
             {
                 ret += currentChar;
