@@ -1,5 +1,5 @@
 package ast;
-
+import emitter.Emitter;
 /**
  * Assignment is an AST Statement which assigns a variable name to its value.
  * @author Pranav Varmaraja
@@ -39,6 +39,12 @@ public class Assignment extends Statement {
      */
     public Expression getExpression() {
         return exp;
+    }
+
+    @Override
+    public void compile(Emitter e) {
+        exp.compile(e);
+        e.emit("sw $v0 var" + getVariable());
     }
 
 

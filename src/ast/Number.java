@@ -1,4 +1,5 @@
 package ast;
+import emitter.Emitter;
 
 /**
  * Number is an AST Expression which stores an integer.
@@ -28,6 +29,13 @@ public class Number extends Expression {
      */
     public int getValue() {
         return value;
+    }
+
+    @Override
+    public void compile(Emitter e) {
+        e.emit("li $v0 " + this.getValue());
+
+
     }
     
 }

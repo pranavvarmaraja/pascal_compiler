@@ -1,4 +1,5 @@
 package ast;
+import emitter.Emitter;
 
 /**
  * BinOp is an AST Expression which stores a binary operation along with its two operands, which can also be expressions.
@@ -50,6 +51,27 @@ public class BinOp extends Expression {
      */
     public Expression getSecondExp() {
         return exp2;
+    }
+
+    @Override
+    public void compile(Emitter e) {
+
+        exp1.compile(e);
+        e.emitPush("$v0");
+        exp2.compile(e);
+        e.emitPop("$t0");
+        if(getOp().equals("+")) {
+            e.emit("add $v0 $t0 $v0");
+        } else if(getOp().equals("-")) {
+            e.emit("sub $v0 $t0 $v0");
+        } else if(getOp().equals("*")) {
+            e.emit("mult $t0 $v0");
+            e.emit("mflo $v0");
+        } else {
+            e.emit("div $t0 $v0");
+            e.emit("mflo $v0");
+        }
+
     }
     
 }

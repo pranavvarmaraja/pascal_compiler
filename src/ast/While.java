@@ -1,4 +1,5 @@
 package ast;
+import emitter.Emitter;
 
 /**
  * While is an AST Statement class which stores all Statements within an WHILE cond DO ...  statement.
@@ -41,6 +42,30 @@ public class While extends Statement{
      */
     public Statement getStatement() {
         return stmt;
+    }
+
+    @Override
+    public void compile(Emitter e) {
+        int labelId = e.nextLabelID();
+        if(cond.getOp().equals("<=") || cond.getOp().equals(">=")) {
+            cond.compile(e, "endwhile" + labelId);
+            e.emit("j startwhile" + labelId);
+        } else {
+            cond.compile(e, "startwhile" + labelId);
+            e.emit("j endwhile" + labelId);
+        }
+
+        e.emit("startwhile" + labelId + ":");
+        getStatement().compile(e);
+        if(cond.getOp().equals("<=") || cond.getOp().equals(">=")) {
+            cond.compile(e, "endwhile" + labelId);
+            e.emit("j startwhile" + labelId);
+        } else {
+            cond.compile(e, "startwhile" + labelId);
+            e.emit("j endwhile" + labelId);
+        }
+        e.emit("endwhile" + labelId + ":");
+
     }
     
     

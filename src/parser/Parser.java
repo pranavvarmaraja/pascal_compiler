@@ -258,17 +258,31 @@ public class Parser {
     }
 
     /**
-     * parses a program, defined as procedureDeclarations followed by a statement
-     * @return Program, AST class containing the procedureDeclaration list and the body of the program
+     * parses a program, defined as a list of variables, a list of procedureDeclarations, followed by a statement
+     * @return Program, AST class containing the procedureDeclaration list, variableName list, and the body of the program
      */
     public Program parseProgram() {
 
         ArrayList<ProcedureDeclaration> procedures = new ArrayList<ProcedureDeclaration>();
+        ArrayList<String> variables = new ArrayList<String>();
+
+        while(currToken.equals("VAR")) {
+            eat("VAR");
+            while(!currToken.equals(";")) {
+                if(isWord(currToken)) {
+                    variables.add(currToken);
+                    eat(currToken);
+                } else {
+                    eat(",");
+                }
+            }
+            eat(";");
+        }
 
         while(currToken.equals("PROCEDURE")) {
             procedures.add(parseProcedure());
         }
-        return new Program(procedures, parseStatement());
+        return new Program(variables, procedures, parseStatement());
 
     }
 

@@ -1,4 +1,5 @@
 package ast;
+import emitter.Emitter;
 
 /**
  * Variable is an AST Expression which stores an variable name.
@@ -26,6 +27,12 @@ public class Variable extends Expression{
      */
     public String getName() {
         return name;
+    }
+
+    @Override
+    public void compile(Emitter e) {
+        e.emit("la $t0 var" + getName());
+        e.emit("lw $v0 ($t0)");
     }
     
 }

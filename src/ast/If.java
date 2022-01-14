@@ -1,4 +1,5 @@
 package ast;
+import emitter.Emitter;
 
 /**
  * If is an AST Statement class which stores all Statements within an IF cond THEN ...  statement.
@@ -42,4 +43,20 @@ public class If extends Statement {
         return stmt;
     }
     
+    @Override
+    public void compile(Emitter e) {
+        int labelId = e.nextLabelID();
+        if(cond.getOp().equals("<=") || cond.getOp().equals(">=")) {
+            cond.compile(e, "endif" + labelId);
+            e.emit("j startif" + labelId);
+        } else {
+            cond.compile(e, "startif" + labelId);
+            e.emit("j endif" + labelId);
+        }
+
+        e.emit("startif" + labelId + ":");
+        getStatement().compile(e);
+        e.emit("endif" + labelId + ":");
+
+    }
 }

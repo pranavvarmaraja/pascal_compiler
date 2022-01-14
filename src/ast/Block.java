@@ -1,6 +1,7 @@
 package ast;
 
 import java.util.List;
+import emitter.Emitter;
 
 /**
  * Block is an AST Statement class which stores all Statements within a BEGIN...END block statement.
@@ -36,5 +37,12 @@ public class Block extends Statement {
      */
     public void addStatement(Statement s) {
         stmts.add(s);
+    }
+    
+    @Override
+    public void compile(Emitter e) {
+        for(Statement stmt: stmts) {
+            stmt.compile(e);
+        }
     }
 }

@@ -1,4 +1,5 @@
 package ast;
+import emitter.Emitter;
 /**
  * Condition is an AST class to represent a boolean condition in the form expr relop expr
  * @author Pranav Varmaraja
@@ -46,6 +47,41 @@ public class Condition {
      */
     public Expression getSecondExp() {
         return exp2;
+    }
+
+    /**
+     * Compiles a condition into MIPS assembly by creating a branch statement depending on the relop
+     * The branch statement then specifies a target label for the program to jump to depending
+     * on the outcome of the relop.
+     * @param e Emitter used to emit MIPS code
+     * @param targetLabel label to jump to if the condition evaluates to true (or false in the case of >= and <=)
+     */
+    public void compile(Emitter e, String targetLabel) {
+        exp1.compile(e);
+        e.emitPush("$v0");
+        exp2.compile(e);
+        e.emitPop("$t0");
+        switch (getOp()) {
+            case "=":
+                e.emit("beq $t0 $v0 " + targetLabel);
+                break;
+            case "<>":
+                e.emit("bne $t0 $v0 " + targetLabel);
+                break;
+            case "<":
+                e.emit("blt $t0 $v0 " + targetLabel);
+                break;
+            case ">":
+                e.emit("bgt $t0 $v0 " + targetLabel);
+                break;
+            case "<=":
+                e.emit("bgt $t0 $v0 " + targetLabel);
+                break;
+            case ">=":
+                e.emit("blt $t0 $v0 " + targetLabel);
+                break;
+
+        }
     }
     
 }
