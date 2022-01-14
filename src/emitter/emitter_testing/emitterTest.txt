@@ -1,13 +1,21 @@
-VAR x,y;
+VAR count, ignore, times;
+PROCEDURE printSquares(low,high);
+VAR count,square;
 BEGIN
-    x := 3;
-    y := 4;
-    IF 14 = 14 THEN
+    count:=low;
+    WHILE count <=high DO
     BEGIN
-        IF 14 <> 14 THEN WRITELN(3);
-        IF 14 <= 14 THEN WRITELN(4);
+        square := count * count;
+        WRITELN(square);
+        count := count + 1;
+        times := times + 1;
     END;
-    IF 15 > 14 THEN WRITELN(5);
-    WRITELN(x+y);
 END;
-.
+
+BEGIN
+    count := 196;
+    times := 0;
+    ignore := printSquares(10,13);
+    WRITELN(count);
+    WRITELN(times);
+END;

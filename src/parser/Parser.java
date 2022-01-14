@@ -287,7 +287,7 @@ public class Parser {
     }
 
     /**
-     * parses a procedureDeclaration in the form PROCEDURE id(params); stmt
+     * parses a procedureDeclaration in the form PROCEDURE id(params); VAR stmt
      * @return ProcedureDeclaration AST class storing the name, body, and params of the declaration
      */
     public ProcedureDeclaration parseProcedure() {
@@ -306,7 +306,20 @@ public class Parser {
         }
         eat(")");
         eat(";");
-        return new ProcedureDeclaration(procedureName, parseStatement(),params);
+        ArrayList<String> variables = new ArrayList<String>();
+        while(currToken.equals("VAR")) {
+            eat("VAR");
+            while(!currToken.equals(";")) {
+                if(isWord(currToken)) {
+                    variables.add(currToken);
+                    eat(currToken);
+                } else {
+                    eat(",");
+                }
+            }
+            eat(";");
+        }
+        return new ProcedureDeclaration(procedureName, parseStatement(),params,variables);
     }
 
 

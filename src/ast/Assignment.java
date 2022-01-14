@@ -44,7 +44,11 @@ public class Assignment extends Statement {
     @Override
     public void compile(Emitter e) {
         exp.compile(e);
-        e.emit("sw $v0 var" + getVariable());
+        if(!e.isLocalVariable(getVariable())) {
+            e.emit("sw $v0 var" + getVariable()); 
+        } else {
+            e.emit("sw $v0 " + e.getOffset(getVariable())+"($sp)");
+        }
     }
 
 

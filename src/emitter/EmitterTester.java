@@ -19,7 +19,7 @@ public class EmitterTester {
         Scanner scanner = null;
         try{
             scanner = new Scanner(new FileInputStream
-        (new File("/home/pranav/projects/ATCS_Compilers/Compiler/src/emitter/emitter_testing/parserTest9.txt"))); //paste your desired filepath here
+        (new File("/home/pranav/projects/ATCS_Compilers/Compiler/src/emitter/emitter_testing/parserTest13.txt"))); //paste your desired filepath here
         } catch(FileNotFoundException e) {
             e.printStackTrace();
         }

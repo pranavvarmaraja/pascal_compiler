@@ -73,6 +73,9 @@ public class Program {
         getStatement().compile(e);
         e.emit("li $v0 10");
         e.emit("syscall");
+        for(ProcedureDeclaration procedure: getProcedures()) {
+            procedure.compile(e);
+        }
 
 
     }
